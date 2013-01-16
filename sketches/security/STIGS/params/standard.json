@@ -542,7 +542,7 @@
                            "atos2":
                            {
                                "/etc/audit/audit.rules": "/var/cfengine/files/etc/audit/audit.rules.atos2",
-                               "/etc/pam.d/system-auth-ac": "/var/cfengine/files/etc/pam.d/system-auth-ac.atos2",
+                               "/etc/pam.d/system-auth-ac": "/var/cfengine/files/etc/pam.d/system-auth-ac.atos2"
                            }
                        }
                      },
@@ -564,7 +564,7 @@
                            // GEN001160
                            "orphan_dirs_exclude": [ "/gpfs", "/homeless", "/media", "/home" ],
                            "orphan_filenames_exclude": [ ]
-                       }
+                       },
 
                        "linux":
                        {
@@ -575,13 +575,14 @@
                    }
                  },
 
-//###############################################################################
-//#FILE EDITS SECTION:
-//#Lines to (check for|insert into|delete from) files
-//#LNX00140 - Grub Password insertion
-//default_password;password --md5 $1$8fI020$YPs7MCo3A1ZkS7xagjYnb0;linux
+// ###############################################################################
+// #FILE EDITS SECTION:
+// #Lines to (check for|insert into|delete from) files
+// #LNX00140 - Grub Password insertion
+// default_password;password --md5 $1$8fI020$YPs7MCo3A1ZkS7xagjYnb0;linux
 
-        "audit_rules": // /etc/audit/audit.rules
+        // /etc/audit/audit.rules
+        "audit_rules":
         {
             // check: delete all, then enable editing
             "GEN002660": [ "-D", "-e 1" ],
@@ -624,7 +625,7 @@
             "/etc/pam.d/system-auth-ac":
             {
                 // Three Failed Login Attempts
-                "GEN000460": [ "account required\s*/lib/security/pam_tally.so deny=3 no_magic_root reset" ],
+                "GEN000460": [ "account required\\s*/lib/security/pam_tally.so deny=3 no_magic_root reset" ],
 
                 // Password Character Mix and Password Reuse
                 "GEN000600": [ ".*lcredit=-[1-9].*", ".*ucredit=-[1-9].*" ],

@@ -129,5 +129,9 @@ file_integrity:
 	$(CFSKETCH_DA) --install Security::file_integrity --activate Security::file_integrity=$(SOURCEDIR)/security/file_integrity/params/pcidss_v2.json
 	$(RUNNER)
 
+STIGS:
+	$(CFSKETCH_DA) --install Security::STIGS --activate Security::STIGS=$(SOURCEDIR)/security/STIGS/params/standard.json
+	$(RUNNER)
+
 wordpress:
 	@echo NOT IMPLEMENTED
