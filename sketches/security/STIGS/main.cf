@@ -1,0 +1,63 @@
+body file control
+{
+  namespace => "cfdc_stigs";
+}
+
+bundle agent entry(prefix, enabled, templates, services, files, audit_rules, edits)
+{
+  meta:
+      # __PREFIX__ will be supplied by cf-sketch
+      "vars[prefix][type]"               string => "NON_EMPTY_STRING";
+      "vars[prefix][default]"            string => "__PREFIX__";
+
+      "vars[fix][type]"                  string => "CONTEXT";
+      "vars[fix][default]"               string => "!any";
+
+      "vars[enabled][type]"              string => "LIST(NON_EMPTY_STRING)";
+
+      "vars[templates][type]"            string => "KVARRAY(
+_key:PATH
+)";
+
+      "vars[services][type]"             string => "KVARRAY(
+_key:NON_EMPTY_STRING
+)";
+
+      "vars[files][type]"                string => "ARRAY(
+orphan_dirs_exclude:LIST(PATH)
+orphan_filenames_exclude:LIST(PATH)
+)";
+
+      "vars[audit_rules][type]"          string => "KVARRAY(
+_key:NON_EMPTY_STRING
+)";
+
+      "vars[edits][type]"          string => "KVARRAY(
+_key:PATH
+)";
+  vars:
+      # often you need a unique value for the current run through a
+      # bundle, especially if you use if_repaired and such.  The
+      # canon_prefix will give you that.
+      "canon_prefix" string => canonify("$(prefix)");
+
+      # pretty-print the authors and dependencies
+      "dependencies" string => join(", ", "$(prefix)sketch_depends");
+      "authors" string => join(", ", "$(prefix)sketch_authors");
+
+  reports:
+    default:debug::
+      "$($(prefix)sketch_name) license = $($(prefix)sketch_license)";
+      "$($(prefix)sketch_name) dependencies = $(dependencies)";
+
+    default:verbose::
+      "$($(prefix)sketch_name) version $($(prefix)sketch_version) by $(authors) starting up...";
+
+      # use the "verbose" context to display extra information (for the user)
+    default:verbose::
+      "Invoking entry_point: prefix $(prefix) type $(mytype) myarray lookup of path1 $($(myarray)[path1])";
+
+      # use the "debug" context to help debug the sketch (for the developer)
+    default:debug::
+      "This is debugging; running from $(bundle_home)";
+}

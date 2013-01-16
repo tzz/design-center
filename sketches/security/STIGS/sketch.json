@@ -1,0 +1,23 @@
+{
+    "manifest":
+    {
+        "main.cf": { "desc": "main file" },
+        "test.cf": { "desc": "standalone test" },
+        "README.md": { "documentation": true },
+        "params/standard.json": { "comment": "standard configuration of STIGS policies" },
+    },
+
+    "metadata":
+    {
+        "name": "Security::STIGS",
+	"description": "STIGS implementation sketch",
+        "version": 1.00,
+        "license": "MIT",
+        "tags": [ "cfdc", "STIGS", "security", "compliance" ],
+        "authors": [ "Nakarin Phooripoom <nakarin.phooripoom@cfengine.com>", "Eystein Stenberg <eystein@cfengine.com>", "Ted Zlatanov <tzz@lifelogs.com>" ],
+        "depends": { "CFEngine::stdlib": { "version": 105 }, "cfengine": { "version": "3.4.0" }, "os": [ "linux" ] }
+    },
+
+    "entry_point": "main.cf",
+    "interface": [ "main.cf" ]
+}

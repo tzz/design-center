@@ -1,0 +1,636 @@
+{
+    "Security::STIGS":
+    {
+        "fix": false,
+
+        "enabled":
+        [
+            // Modifies /etc/inittab, restarts inittab if repaired. Requires password to enter single user mode.
+            "GEN000020",
+
+            // Modifies /etc/inittab, restarts inittab if repaired. Requires password to enter single user mode.
+            "GEN000040",
+
+            // Modifies /etc/inittab, restarts inittab if repaired. Requires password to enter single user mode.
+            "GEN000060",
+
+            // Modifies /etc/syslog.conf. MOG. Restarts syslog on repair.Sends Authentication log to /var/log/secure.
+            "GEN000440",
+
+            //  /etc/pam.d/system-auth Three Failed Login Attempts, copy from master configuration if promise fails.
+            "GEN000460",
+
+            // login defs - password guidelines
+            "GEN000480",
+
+            // Modifies /etc/profile. Set TMOUT to lock screen after 15 min.
+            "GEN000500",
+
+            // login defs - password guidelines
+            "GEN000540",
+
+            // Modifies /etc/passwd based on passwords in /etc/shadow. Disables Accounts without passwords. Sets shell to /sbin/nologin. This list needs to be reviewed and what about LDAP checks?
+            // "GEN000560",
+
+            // login defs - password guidelines
+            "GEN000580",
+
+            // /etc/pam.d/system-auth Password Character Mix, uppercase/lowercase requirement copy from master configuration if promise fails.
+            "GEN000600",
+
+            // /etc/pam.d/system-auth Password Character Mix, digit requirement. copy from master configuration if promise fails.
+            "GEN000620",
+
+            // /etc/pam.d/system-auth Password Character Mix, special character requirement copy from master configuration if promise fails.
+            "GEN000640",
+
+            // login defs - password guidelines
+            "GEN000700",
+
+            // /etc/pam.d/system-auth Password Reuse policy >=5.
+            "GEN000800",
+
+            // login defs - password guidelines
+            "GEN000820",
+
+            // Modifies /etc/passwd. MOG. Sets root home directory to /root.
+            "GEN000900",
+
+            // !Mog's /root. 
+            "GEN000920",
+
+            // !Allows root only from system console. Empties /etc/securetty before edit.Mog's /etc/securetty.(Deletes lines and inserts line "console")
+            // "GEN000980",
+
+            // !Allows root only from system console. Empties /etc/securetty before edit.Mog's /etc/securetty.(Inserts line "console" only)
+            // "GEN001000",
+
+            //  This one could prevent root login remotely!Edits Pamd config,#!Mog's /etc/security/access.conf.Modifies /etc/security/access.conf.
+            // "GEN001020",
+
+            //  Disables root shells in /usr/bin. Set root shell to /bin/bash.
+            "GEN001080",
+
+            //  Modify /etc/ssh/sshd_config. PREVENTS ROOT SSH!!!
+            // "GEN001120",
+
+            // Scan for orphaned files, change owner and group where necessary. Currently takes forever, unverified!
+            // "GEN001160",
+
+            // !Mog's network services daemon files.
+            "GEN001180",
+
+            // !Mog's System directories(/etc, /bin, /sbin, /usr/sbin, /usr/sbin)
+            "GEN001220",
+
+            // !Mog's System directories(/etc, /bin, /sbin, /usr/sbin, /usr/sbin)
+            "GEN001240",
+
+            // !Sets mode on system log files.
+            "GEN001260",
+
+            // !Sets mode on man page files.
+            "GEN001280",
+
+            // !Sets mode on libarary files in library dirs.
+            "GEN001300",
+
+            // deals with NIS and NIS files.
+            "GEN001320",
+
+            // deals with NIS and NIS files.
+            "GEN001340",
+
+            // deals with NIS and NIS files.
+            "GEN001360",
+
+            // !Mog's /etc/passwd.
+            "GEN001380",
+
+            // !Mog's /etc/shadow. Mog's /etc/passwd
+            "GEN001400",
+
+            // !Mog's /etc/shadow.
+            "GEN001420",
+
+            // !Mog's users home directories.(Username:Wheel) 
+            // "GEN001440",
+
+            // !Mog's users home directories.(Username:Wheel) if "/var/lib/avahi-autoipd/." does not exist, create it. Set Mode. Avahi-autoipd does not seem to have anything to do with the stig requirment "interactive user assigned home dirs".
+            // "GEN001460",
+
+            // !Mog's users home directories.(Username:Wheel)
+            // "GEN001480",
+
+            // !Mog's users home directories.(Username:Wheel)
+            // "GEN001500",
+
+            // !Mog's users home directories.(Username:Wheel)
+            // "GEN001520",
+
+            // !Mog's users home directories.(Username:Wheel)
+            "GEN001540",
+
+            // !Mog's users home directories.(Username:Wheel) #!Sets umask in bash and cshell rc files.
+            "GEN001560",
+
+            // !Mog's /etc/rc.d/init.d/* files, excludes iptables.Mog's /etc/rc.d/(rc files).
+            "GEN001580",
+
+            // !Mog's /etc/rc.d/init.d/* files, excludes iptables.Mog's /etc/rc.d/(rc files).
+            "GEN001620",
+
+            // !Mog's /etc/rc.d/init.d/* files, excludes iptables.Mog's /etc/rc.d/(rc files).
+            "GEN001640",
+
+            // !Mog's /etc/rc.d/init.d/* files, excludes iptables.Mog's /etc/rc.d/(rc files).
+            "GEN001660",
+
+            // !Mog's /etc/rc.d/init.d/* files, excludes iptables.Mog's /etc/rc.d/(rc files).
+            "GEN001680",
+
+            // !Mog's /etc/rc.d/init.d/* files, excludes iptables.Mog's /etc/rc.d/(rc files).
+            "GEN001700",
+
+            // !Mog's Global Init files.(/etc/profile, /etc/bashrc,/etc/environment) Appends "mesg n" if it doesn't exist.
+            "GEN001720",
+
+            // !Mog's Global Init files. Appends "mesg n" if it doesn't exist.
+            "GEN001740",
+
+            // !Mog's Global Init files. Appends "mesg n" if it doesn't exist.
+            "GEN001760",
+
+            // !Mog's Global Init files. Appends "mesg n" if it doesn't exist.
+            "GEN001780",
+
+            // !Mog's skeleton dot files
+            "GEN001800",
+
+            // !Mog's skeleton dot files
+            "GEN001820",
+
+            // !Mog's users home directories.
+            "GEN001860",
+
+            // !Mog's excluded local init files in users home dirs.
+            "GEN001880",
+
+            // !Mog's users home directories.
+            "GEN001920",
+
+            // !Mog's users home directories.
+            "GEN001940",
+
+            // !Removes mesg file from users home dirs. 
+            "GEN001960",
+
+            // !For files /root/.rhosts and .shosts and /etc/hosts.equiv, delete them if they arent symlinks, then create a symlink to /dev/null
+            "GEN002040",
+
+            // !Comments lines in pam files matching "^auth.*pam_rhosts_auth.so" in /etc/pam.d/ekshell and kshell. 
+            "GEN002100",
+
+            // !Creates/Mog's /etc/shells. Destructively Edits /etc/shells.
+            "GEN002120",
+
+            // !Mog's shell files.
+            "GEN002160",
+
+            // !Mog's shell files.
+            "GEN002180",
+
+            // !Mog's shell files.
+            "GEN002200",
+
+            // !Mog's shell files.
+            "GEN002220",
+
+            // !Append a line to /etc/udev/rules.d/55-audio-perms.rules - FIX ME.
+            // "GEN002320",
+
+            // !Append a line to /etc/udev/rules.d/55-audio-perms.rules - FIX ME.
+            // "GEN002340",
+
+            // !Append a line to /etc/udev/rules.d/55-audio-perms.rules - FIX ME.
+            // "GEN002360",
+
+            // !Sets filesystems to mount with nosuid/
+            "GEN002420",
+
+            // !Changes mode on /var/cfengine/state/cf_incoming.* 
+            "GEN002480",
+
+            // !Sets umask in bash and cshell rc files.
+            "GEN002560",
+
+            // !Edits /etc/passwd, Sets false shell to users with UID < 500
+            "GEN002640",
+
+            // !Enables Auditing and causes kernel panic if Auditd fails. Sets Audit buffer to 8192. 
+            "GEN002660",
+
+            // !Sets mode on Audit log files.
+            "GEN002680",
+
+            // !Sets mode on system log files.
+            "GEN002700",
+
+            // Depends on GEN002660, audit rules for failed file access attempts.
+            "GEN002720",
+
+            // Depends on GEN002660, audit rules for Audit File and Program Deletion.
+            "GEN002740",
+
+            // Depends on GEN002660, audit rules for Audit Administrative, Privileged, and Security Actions.
+            "GEN002760",
+
+            // Depends on GEN002660, audit rules for login/logout.
+            "GEN002800",
+
+            // Depends on GEN002660, audit rules for sysad actions.
+            "GEN002820",
+
+            // !Mog's /etc/logrotate.d/audit,--HIRSCH disabled mog changes,not called for by stig. This should probably be customized! Destructively edits /etc/logrotate.d/audit to rotate audit logs daily.
+            "GEN002860",
+
+            // !Mog's /etc/cron.allow. Destructively Edits /etc/cron.allow to add cron users.#!Mog's /etc/cron.deny. Destructively edits /etc/cron.deny. Appends line "ALL" if it doesn't exist.
+            "GEN002960",
+
+            // !Mog's /etc/cron.allow.
+            "GEN002980",
+
+            // !Mog's associated cron files.
+            "GEN003040",
+
+            // !Mog's /etc/cron.allow. #!Mog's /etc/cron.deny, Destructively edits /etc/cron.deny. Appends line "ALL" if it doesn't exist.
+            "GEN003060",
+
+            // !Mog's associated cron files.
+            "GEN003080",
+
+            // !Mog's cron directories and files recursing once.
+            "GEN003100",
+
+            // !Mog's cron directories and files recursing once.
+            "GEN003120",
+
+            // !Mog's cron directories and files recursing once. 
+            "GEN003140",
+
+            // !Mog's /etc/syslog.conf. Restarts syslog on repair. Send cron logs to /var/log/cron.
+            "GEN003160",
+
+            // !Mog's all /var/log/cron.* files.
+            "GEN003180",
+
+            // !Mog's /etc/crond.deny, Destructively edits /etc/cron.deny. Appends line "ALL" if it doesn't exist.
+            "GEN003200",
+
+            // !Mog's /etc/cron.allow. 
+            "GEN003240",
+
+            // !Mog's /etc/cron.deny, Destructively edits /etc/cron.deny. Appends line "ALL" if it doesn't exist.
+            "GEN003260",
+
+            // !Mog's /etc/at.deny, Edits /etc/at.deny to add restricted users
+            "GEN003280",
+
+            // !Mog's /etc/at.deny, Edits /etc/at.deny to add restricted users
+            "GEN003300",
+
+            // !Mog's /etc/at.deny, Mogs /etc/at.allow, Destructively edits /etc/at.allow to remove restricted users. Edits /etc/at.deny to add restricted users
+            // "GEN003320",
+
+            // !Mog's /etc/at.deny, Mogs /etc/at.allow. Edits /etc/at.deny to add restricted users
+            // "GEN003340",
+
+            // !Mog's /var/spool/at/spool/
+            "GEN003400",
+
+            // !Mog's /var/spool/at/spool/
+            "GEN003420",
+
+            // !Mog's /etc/at.allow
+            "GEN003460",
+
+            // !Mog's /etc/at.deny
+            "GEN003480",
+
+            // !Edits /etc/security/limits.conf to disable core dumps.
+            "GEN003500",
+
+            // !Mog's /var/crash
+            "GEN003520",
+
+            // !Mog's /etc/sysctl.conf, edits /etc/sysctl.conf to stop packet forwarding and to limit syn.
+            "GEN003600",
+
+            // Sets Permissions, group, and user on /etc/syslog.conf. Restarts syslog on repair. Modifies auth.notice logging
+            "GEN003660",
+
+            // Turns off (chkconfig off) non-essential services.
+            "GEN003700",
+
+            // !Mog's /etc/xinetd.conf
+            "GEN003720",
+
+            // !Mog's /etc/xinetd.conf
+            "GEN003740",
+
+            // !Mogs's /etc/services
+            "GEN003760",
+
+            // !Mog's /etc/services
+            "GEN003780",
+
+            // !Disables "unenecessary services".  Customize this section.
+            "GEN003860",
+
+            // !Disables network analysis tools.
+            "GEN003865",
+
+            // !Mogs /bin/traceroute
+            "GEN003960",
+
+            // !Mogs /bin/traceroute
+            "GEN003980",
+
+            // !Mogs /bin/traceroute
+            "GEN004000",
+
+            // !Mogs /etc/aliases.
+            "GEN004360",
+
+            // !Mogs /etc/aliases.
+            "GEN004380",
+
+            // ! Edits /etc/mail/sendmail.cf. Sets LogLevel for Sendmail.
+            "GEN004440",
+
+            // Sets Permissions, group, and user on /etc/syslog.conf. Restarts syslog on repair.
+            "GEN004460",
+
+            // !Mog's /var/log/maillog
+            "GEN004480",
+
+            // !Mog's /var/log/maillog
+            "GEN004500",
+
+            // !Edits /etc/mail/sendmail.cf. Removes help command from sendmail.
+            "GEN004540",
+
+            // !Edits /etc/mail/sendmail.cf. Removes version number from sendmail.
+            "GEN004560",
+
+            // !Deletes all .forward files from home directories.
+            "GEN004580",
+
+            // !Mog's /etc/aliases. Comments lines from /etc/aliases to remove decode command from sendmail.
+            "GEN004640",
+
+            // !Mog's FTP Users' File.Creates it if it doesnt exist.
+            "GEN004880",
+
+            // !Adds names of system accounts and accounts with UID < 500 to ftpusers deny list.
+            // "GEN004900",
+
+            // !Mog's FTP Users' File.Creates it if it doesnt exist.
+            // "GEN004920",
+
+            // !Mog's FTP Users' File.Creates it if it doesnt exist.
+            // "GEN004940",
+
+            // !Edits /etc/passwd, Sets false shell to users with UID < 500
+            "GEN005000",
+
+            // !Mog's /etc/snmp/snmp.conf.
+            "GEN005320",
+
+            // !Mog's /etc/snmp/snmp.conf.
+            "GEN005360",
+
+            // !Sets Permissions, group, and user on /etc/syslog.conf. Restarts syslog on repair.
+            "GEN005400",
+
+            // !Sets Permissions, group, and user on /etc/syslog.conf. Restarts syslog on repair.
+            "GEN005420",
+
+            // !Edits /etc/ssh/sshd_config. Sets SSH protocol to 2 and Sets ciphers
+            "GEN005500",
+
+            // !Mogs /etc/ssh/ssh_banner.Copies down /etc/issue.
+            "GEN005540",
+
+            // !Mogs /etc/sysctl.conf. Stops IP forwarding.
+            "GEN005600",
+
+            // !Mogs /etc/exports
+            "GEN005740",
+
+            // !Mogs /etc/exports
+            "GEN005760",
+
+            // !Mogs /etc/samba/smb.conf
+            "GEN006100",
+
+            // !Mogs /etc/samba/smb.conf
+            "GEN006120",
+
+            // !Mogs /etc/samba/smb.conf
+            "GEN006140",
+
+            // !Mogs /usr/bin/smbpasswd
+            "GEN006160",
+
+            // !Mogs /usr/bin/smbpasswd
+            "GEN006180",
+
+            // !Mogs /usr/bin/smbpasswd
+            "GEN006200",
+
+            // !Sets mode on /etc/news/hosts.nntp
+            "GEN006260",
+
+            // !Sets mode on /etc/news/hosts.nntp.nolimit
+            "GEN006280",
+
+            // !Sets mode on /etc/news/nnrp.access
+            "GEN006300",
+
+            // !Sets mode on /etc/news/passwd.nntp
+            "GEN006320",
+
+            // !Sets user/group on /etc/news.
+            "GEN006340",
+
+            // !Sets user/group on /etc/news.
+            "GEN006360",
+
+            // !Item not found in checklist. Mog's security_tools(iptables?).
+            "GEN006520",
+
+            // !Creates/Modifies /etc/hosts.allow and hosts.deny. Adds lines for generic networks. CHANGE ME!!
+            "GEN006620",
+
+            // !Enforces grub to not boot without password. Sets password to "cfengine". CHANGE ME!!!
+            "LNX00140",
+
+            // !Mog's /boot/grub/grub.conf"
+            "LNX00160",
+
+            // !Mog's /etc/lilo.conf.
+            "LNX00220",
+
+            //  Deletes unnecessary users (ftp, news, gopher, etc) from /etc/passwd
+            "LNX00320",
+
+            //  Deletes unnecessary users from /etc/passwd
+            "LNX00340",
+
+            // !Edits custom GDM  to enable X server audit level, sets timeout to 15 min. 
+            "LNX00360",
+
+            // !Mog's /etc/security/access.conf.
+            "LNX00400",
+
+            // !Mog's /etc/security/access.conf.
+            "LNX00420",
+
+            // !Mog's /etc/security/access.conf.
+            "LNX00440",
+
+            // !Mog's /etc/sysctl.conf.
+            "LNX00480",
+
+            // !Mog's /etc/sysctl.conf.
+            "LNX00500",
+
+            // !Mog's /etc/sysctl.conf.
+            "LNX00520",
+
+            // Modifies /etc/inittab. restarts inittab if repaired.  Disables CTRL+ALT+DEL.
+            "LNX00580",
+
+            // !Mog's /etc/securetty.
+            // "LNX00620",
+
+            // !Mog's /etc/securetty.
+            // "LNX00640",
+
+            // !Mog's /etc/securetty.
+            // "LNX00660",
+
+        ],
+        
+        "templates": { "bycontext":
+                       {
+                           "linux":
+                           {
+                               "/etc/hosts.allow": "/var/cfengine/files/etc/hosts.allow",
+                               "/etc/hosts.deny": "/var/cfengine/files/etc/hosts.deny",
+                               // GEN005540-Location where SSH login banner is stored.
+                               "/etc/issue.net": "/var/cfengine/files/etc/issue.net",
+                           },
+
+                           "!atos2":
+                           {
+                               "/etc/audit/audit.rules": "/var/cfengine/files/etc/audit/audit.rules",
+                               "/etc/pam.d/system-auth-ac": "/var/cfengine/files/etc/pam.d/system-auth-ac",
+                           },
+
+                           "atos2":
+                           {
+                               "/etc/audit/audit.rules": "/var/cfengine/files/etc/audit/audit.rules.atos2",
+                               "/etc/pam.d/system-auth-ac": "/var/cfengine/files/etc/pam.d/system-auth-ac.atos2",
+                           }
+                       }
+                     },
+
+        "services": { "bycontext":
+                      {
+                          "linux":
+                          {
+                              // GEN002720, GEN002740, GEN002760-Set to system log service name.
+                              "syslog": "rsyslog"
+                          }
+                      }
+                    },
+
+        "files": { "bycontext":
+                   {
+                       "linux.m1":
+                       {
+                           // GEN001160
+                           "orphan_dirs_exclude": [ "/gpfs", "/homeless", "/media", "/home" ],
+                           "orphan_filenames_exclude": [ ]
+                       }
+
+                       "linux":
+                       {
+                           // GEN001160
+                           "orphan_dirs_exclude": [ "/media", "/home" ],
+                           "orphan_filenames_exclude": [ ]
+                       }
+                   }
+                 },
+
+//###############################################################################
+//#FILE EDITS SECTION:
+//#Lines to (check for|insert into|delete from) files
+//#LNX00140 - Grub Password insertion
+//default_password;password --md5 $1$8fI020$YPs7MCo3A1ZkS7xagjYnb0;linux
+
+        "audit_rules": // /etc/audit/audit.rules
+        {
+            // check: delete all, then enable editing
+            "GEN002660": [ "-D", "-e 1" ],
+
+            // Audit Failure causes kernel panic if "panic_on_auditf" class is set
+            "GEN002660.panic_on_auditf":  [ "-f 1" ],
+            "GEN002660.!panic_on_auditf": [ "-f 2" ],
+
+            // Audit failed file and program access attempts
+            "GEN002720": [ "-a exit,always -S open -F success=0" ],
+            // Audit File and Program Deletion
+            "GEN002740": [ "-a exit,always -S unlink -S rmdir" ],
+            // Audit administrative, privelaged, and security actions.
+            "GEN002760":
+            [
+                "-w /etc/auditd.conf",
+                "-w /etc/audit.rules",
+                "-a exit,always -F arch=b64 -S settimeofday -S acct -S reboot -S swapon",
+                "-a exit,always -S settimeofday -S setrlimit -S setdomainname",
+                "-a exit,always -S sched_setparam -S sched_setscheduler"
+            ],
+
+            //GEN002780- No longer in STIG checklist.
+
+            //GEN002800 Logon/Logout
+            //Auditd monitors this by default in the source code, as per STIG checklist.
+
+            // Audit Discretionary Access Control Permission Modifications
+            "GEN002820":
+            [
+                "-a exit,always -S chmod -S fchmod -S chown -S chown32 -S fchown",
+                "-a exit,always -S fchown32 -S lchown -S lchown32"
+            ]
+
+            // GEN002840- No longer in STIG checklist.
+        },
+
+        "edits":
+        {
+            "/etc/pam.d/system-auth-ac":
+            {
+                // Three Failed Login Attempts
+                "GEN000460": [ "account required\s*/lib/security/pam_tally.so deny=3 no_magic_root reset" ],
+
+                // Password Character Mix and Password Reuse
+                "GEN000600": [ ".*lcredit=-[1-9].*", ".*ucredit=-[1-9].*" ],
+                "GEN000620": [ ".*dcredit=-[1-9].*" ],
+                "GEN000640": [ ".*ocredit=-[1-9].*", ".*remember=[5-9].*" ]
+            }
+        }
+    }
+}
