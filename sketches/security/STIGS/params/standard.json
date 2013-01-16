@@ -527,22 +527,22 @@
                        {
                            "linux":
                            {
-                               "/etc/hosts.allow": "/var/cfengine/files/etc/hosts.allow",
-                               "/etc/hosts.deny": "/var/cfengine/files/etc/hosts.deny",
+                               "/etc/hosts.allow": { "file": "/var/cfengine/files/etc/hosts.allow" },
+                               "/etc/hosts.deny": { "file": "/var/cfengine/files/etc/hosts.deny" },
                                // GEN005540-Location where SSH login banner is stored.
-                               "/etc/issue.net": "/var/cfengine/files/etc/issue.net",
+                               "/etc/issue.net": { "file": "/var/cfengine/files/etc/issue.net" }
                            },
 
                            "!atos2":
                            {
-                               "/etc/audit/audit.rules": "/var/cfengine/files/etc/audit/audit.rules",
-                               "/etc/pam.d/system-auth-ac": "/var/cfengine/files/etc/pam.d/system-auth-ac",
+                               "/etc/audit/audit.rules": { "file": "/var/cfengine/files/etc/audit/audit.rules" },
+                               "/etc/pam.d/system-auth-ac": { "file": "/var/cfengine/files/etc/pam.d/system-auth-ac" },
                            },
 
                            "atos2":
                            {
-                               "/etc/audit/audit.rules": "/var/cfengine/files/etc/audit/audit.rules.atos2",
-                               "/etc/pam.d/system-auth-ac": "/var/cfengine/files/etc/pam.d/system-auth-ac.atos2"
+                               "/etc/audit/audit.rules": { "file": "/var/cfengine/files/etc/audit/audit.rules.atos2" },
+                               "/etc/pam.d/system-auth-ac": { "file": "/var/cfengine/files/etc/pam.d/system-auth-ac.atos2" }
                            }
                        }
                      },
@@ -562,15 +562,21 @@
                        "linux.m1":
                        {
                            // GEN001160
-                           "orphan_dirs_exclude": [ "/gpfs", "/homeless", "/media", "/home" ],
-                           "orphan_filenames_exclude": [ ]
+                           "orphan_exclude":
+                           {
+                               "dirs": [ "/gpfs", "/homeless", "/media", "/home" ],
+                               "filenames": [ ]
+                           }
                        },
 
                        "linux":
                        {
                            // GEN001160
-                           "orphan_dirs_exclude": [ "/media", "/home" ],
-                           "orphan_filenames_exclude": [ ]
+                           "orphan_exclude": 
+                           { 
+                               "dirs": [ "/media", "/home" ],
+                               "filenames": [ ]
+                           }
                        }
                    }
                  },
@@ -585,25 +591,26 @@
         "audit_rules":
         {
             // check: delete all, then enable editing
-            "GEN002660": [ "-D", "-e 1" ],
+            "GEN002660": { "rules": [ "-D", "-e 1" ] },
 
             // Audit Failure causes kernel panic if "panic_on_auditf" class is set
-            "GEN002660.panic_on_auditf":  [ "-f 1" ],
-            "GEN002660.!panic_on_auditf": [ "-f 2" ],
+            "GEN002660.panic_on_auditf":  { "rules": [ "-f 1" ] },
+            "GEN002660.!panic_on_auditf": { "rules": [ "-f 2" ] },
 
             // Audit failed file and program access attempts
-            "GEN002720": [ "-a exit,always -S open -F success=0" ],
+            "GEN002720": { "rules": [ "-a exit,always -S open -F success=0" ] },
             // Audit File and Program Deletion
-            "GEN002740": [ "-a exit,always -S unlink -S rmdir" ],
+            "GEN002740": { "rules": [ "-a exit,always -S unlink -S rmdir" ] },
             // Audit administrative, privelaged, and security actions.
-            "GEN002760":
-            [
-                "-w /etc/auditd.conf",
-                "-w /etc/audit.rules",
-                "-a exit,always -F arch=b64 -S settimeofday -S acct -S reboot -S swapon",
-                "-a exit,always -S settimeofday -S setrlimit -S setdomainname",
-                "-a exit,always -S sched_setparam -S sched_setscheduler"
-            ],
+            "GEN002760": { "rules":
+                           [
+                               "-w /etc/auditd.conf",
+                               "-w /etc/audit.rules",
+                               "-a exit,always -F arch=b64 -S settimeofday -S acct -S reboot -S swapon",
+                               "-a exit,always -S settimeofday -S setrlimit -S setdomainname",
+                               "-a exit,always -S sched_setparam -S sched_setscheduler"
+                           ]
+                         },
 
             //GEN002780- No longer in STIG checklist.
 
@@ -611,11 +618,12 @@
             //Auditd monitors this by default in the source code, as per STIG checklist.
 
             // Audit Discretionary Access Control Permission Modifications
-            "GEN002820":
-            [
-                "-a exit,always -S chmod -S fchmod -S chown -S chown32 -S fchown",
-                "-a exit,always -S fchown32 -S lchown -S lchown32"
-            ]
+            "GEN002820": { "rules":
+                           [
+                               "-a exit,always -S chmod -S fchmod -S chown -S chown32 -S fchown",
+                               "-a exit,always -S fchown32 -S lchown -S lchown32"
+                           ]
+                         }
 
             // GEN002840- No longer in STIG checklist.
         },
