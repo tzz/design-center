@@ -524,14 +524,14 @@ _key:PATH
       comment => "CAT II UNIX STIG: 3.3 Root Account",
       action => STIGS_policy,
       handle => "stigs_files_redhat_5_etc_pamd_sshd",
-      edit_line => maintain_pamd_sshd;
+      edit_line => maintain_pamd;
 
     GEN001020::
       "/etc/pam.d/login" -> { "GEN001020" }
       comment => "CAT II UNIX STIG: 3.3 Root Account",
       action => STIGS_policy,
       handle => "stigs_files_redhat_5_etc_pamd_login",
-      edit_line => maintain_pamd_login;
+      edit_line => maintain_pamd;
 
     GEN001020|LNX00400|LNX00420|LNX00440::
       "/etc/security/access.conf" -> { "GEN001020", "LNX00400", "LNX00420", "LNX00440" }
@@ -1411,22 +1411,6 @@ bundle agent deleting_accounts(name)
       edit_line => delete_lines_matching("^$(name):.*");
 }
 
-# GEN005500
-bundle edit_line maintain_ssh_config
-{
-  delete_lines:
-      "^Ciphers.*" -> { "GEN005500" }
-      comment => "Clear up an existing Ciphers",
-      action => STIGS_policy,
-      handle => "maintain_ssh_config_delete_lines_gen005500";
-
-  insert_lines:
-      "Ciphers aes256-cbc,aes192-cbc,blowfish-cbc,cast128-cbc,aes128-cbc,3des-cbc" -> { "GEN005500" }
-      comment => "Allow only specific ciphers to be used",
-      action => STIGS_policy,
-      handle => "maintain_ssh_config_insert_lines_gen005500";
-}
-
 # GEN000440, GEN003160, GEN003660, GEN004460
 bundle edit_line maintain_syslog_conf
 {
@@ -1589,6 +1573,347 @@ bundle edit_line maintain_etc_profile
       handle => "maintain_etc_profile_insert_lines_gen000500";
 }
 
+# GEN000980, GEN001000
+bundle edit_line maintain_securetty
+{
+  delete_lines:
+    GEN000980::
+      "vc/(\d+)" -> { "GEN000980" }
+      comment => "Allow root to login only from the system console (delete vc[0-9]+).",
+      action => STIGS_policy,
+      handle => "maintain_securetty_delete_vc_lines_gen000980";
+
+    GEN000980::
+      "tty(\d+)" -> { "GEN000980" }
+      comment => "Allow root to login only from the system console (delete tty[0-9]+).",
+      action => STIGS_policy,
+      handle => "maintain_securetty_delete_tty_lines_gen000980";
+
+  insert_lines:
+    GEN000980|GEN001000::
+      "console" -> { "GEN000980", "GEN001000" }
+      comment => "Allow root to login only from the system console.",
+      action => STIGS_policy,
+      handle => "maintain_securetty_insert_console_lines_gen000980_gen001000";
+}
+
+# GEN001020
+bundle edit_line maintain_pamd
+{
+  insert_lines:
+    GEN001020::
+      "account	required	pam_access.so" -> { "GEN001020" }
+      comment => "Root privilege must be gained via switch from user account",
+      action => STIGS_policy,
+      handle => "maintain_pamd_insert_lines_gen001020",
+      location => after("^(account.*auth)$");
+}
+
+# GEN002120
+bundle edit_line maintain_etc_shells
+{
+  insert_lines:
+    GEN002120::
+      "/bin/sh
+/bin/bash
+/sbin/nologin
+/bin/tcsh
+/bin/csh
+/bin/ksh
+/bin/ksh93" -> { "GEN002120" }
+      comment => "Ensure /etc/shells has good contents",
+      action => STIGS_policy,
+      handle => "maintain_etc_shells_insert_lines_gen002120",
+      insert_type => "preserve_block";
+}
+
+# GEN002320
+bundle edit_line remove_audio_devices
+{
+  delete_lines:
+    GEN002320::
+      ".*sound.*" -> { "GEN002320" }
+      comment => "Delete all lines containing 'sound'",
+      action => STIGS_policy,
+      handle => "remove_audio_devices_delete_lines_sound_gen002320";
+
+      ".*snd.*" -> { "GEN002320" }
+      comment => "Delete all lines containing 'snd'",
+      action => STIGS_policy,
+      handle => "remove_audio_devices_delete_lines_snd_gen002320";
+
+      ".*mixer.*" -> { "GEN002320" }
+      comment => "Delete all lines containing 'mixer'",
+      action => STIGS_policy,
+      handle => "remove_audio_devices_delete_lines_mixer_gen002320";
+}
+
+# GEN002320, GEN002340, GEN002360
+bundle edit_line maintain_audio_devices
+{
+  insert_lines:
+    GEN002320|GEN002340|GEN002360::
+      "SUBSYSTEM==\"sound|snd\", OWNER=\"root\", GROUP=\"root\", MODE=\"0644\"",
+      comment => "Append a line to ensure audio devices' permission and ownership",
+      action => STIGS_policy,
+      handle => "maintain_audio_devices_insert_lines_gen002320";
+}
+
+# GEN002560
+bundle edit_line maintain_umask(mask)
+{
+  replace_patterns:
+    GEN002560::
+      "\h+umask\s(?!$(mask)$).*" -> { "GEN002560" }
+      comment => "Ensure umask is 077",
+      action => STIGS_policy,
+      handle => "maintain_umask_replace_patterns_gen002560",
+      replace_with => default:value(" umask 077");
+}
+
+# GEN002860
+bundle edit_line maintain_logrotated_audit
+{
+  insert_lines:
+    GEN002860::
+      "/var/log/audit/audit.log {
+$(const.t)daily
+$(const.t)notifempty
+$(const.t)missingok
+$(const.t)postrotate
+$(const.t)/sbin/service auditd restart 2> /dev/null > /dev/null || true
+$(const.t)endscript
+}" -> { "GEN002860" }
+      comment => "Ensure old audit logs are closed and new audit logs are started daily",
+      action => STIGS_policy,
+      handle => "maintain_logrotated_audit_insert_lines_gen002860",
+      insert_type => "preserve_block";
+}
+
+# GEN002960 GEN003060
+bundle edit_line maintain_cron_allow(name)
+{
+
+  insert_lines:
+    GEN002960::
+      "$(name)" -> { "GEN002960" }
+      comment => "Allow users from the list to use cron utility",
+      action => STIGS_policy,
+      handle => "maintain_cron_allow_insert_lines_gen02960";
+}
+
+# GEN003320
+bundle edit_line maintain_at_allow
+{
+  insert_lines:
+    GEN003320::
+      "root" -> { "GEN003320" }
+      comment => "Remove all restricted users",
+      action => STIGS_policy,
+      handle => "maintain_at_allow_insert_lines_gen03320";
+}
+
+# GEN003600 GEN005600
+bundle edit_line maintain_sysctl_conf
+{
+  delete_lines:
+    GEN003600::
+      "^net.ipv4.tcp_max_syn_backlog.*" -> { "GEN003600" }
+      comment => "Clear up an existing Network parameters.",
+      action => STIGS_policy,
+      handle => "maintain_sysctl_conf_delete_lines_gen003600";
+
+    GEN005600::
+      "^net.ipv4.ip_forward.*" -> { "GEN005600" }
+      comment => "Clear up an existing ip_forward parameters.",
+      action => STIGS_policy,
+      handle => "maintain_sysctl_conf_delete_lines_gen005600";
+  insert_lines:
+    GEN003600::
+      "net.ipv4.tcp_max_syn_backlog = 1280" -> { "GEN003600" }
+      comment => "Secure Network parameters.",
+      action => STIGS_policy,
+      handle => "maintain_sysctl_conf_insert_lines_gen003600";
+
+    GEN005600::
+      "net.ipv4.ip_forward = 0" -> { "GEN005600" }
+      comment => "Disable IP forwarding.",
+      action => STIGS_policy,
+      handle => "maintain_sysctl_conf_insert_lines_gen005600";
+}
+
+# GEN004440 GEN004540, GEN004560
+bundle edit_line maintain_sendmail
+{
+  replace_patterns:
+    GEN004440::
+      "^O LogLevel=(?!9).*" -> { "GEN004440" }
+      comment => "Disable the sendmail help command.",
+      action => STIGS_policy,
+      handle => "maintain_sendmail_replace_patterns_gen004440",
+      replace_with => default:value("O LogLevel=9");
+
+    GEN004540::
+      "^(O.*helpfile)$" -> { "GEN004540" }
+      comment => "Disable the sendmail help command.",
+      action => STIGS_policy,
+      handle => "maintain_sendmail_replace_patterns_gen004540",
+      replace_with => comment("#");
+
+    GEN004560::
+      "^O SmtpGreetingMessage=\$j Sendmail \$v/\$Z; \$b" -> { "GEN004560" }
+      comment => "Hide sendmail version.",
+      action => STIGS_policy,
+      handle => "maintain_sendmail_replace_patterns_gen004560",
+      replace_with => default:value("O SmtpGreetingMessage= Mail Server Ready STIG-GEN004560; $b");   
+}
+
+# GEN001120, GEN005500, GEN005540
+bundle edit_line maintain_sshd_config(ssh_banner_location)
+{
+  delete_lines:
+    GEN005540::
+      "^Banner.*" -> { "GEN005540" }
+      comment => "Clear up an existing Banner.",
+      action => STIGS_policy,
+      handle => "maintain_sshd_config_delete_lines_gen005540";
+
+    GEN001120::
+      "^PermitRootLogin.*" -> { "GEN001120" }
+      comment => "Clear up an existing PermitRootLogin",
+      action => STIGS_policy,
+      handle => "maintain_sshd_config_delete_lines_gen001120";
+
+    GEN005500::
+      "^Protocol.*" -> { "GEN005500" }
+      comment => "Clear up an existing Protocol",
+      action => STIGS_policy,
+      handle => "maintain_sshd_config_delete_lines_gen005500";
+
+  insert_lines:
+    GEN005540::
+      "Banner $(ssh_banner_location)  # GEN005540" -> { "GEN005540" }
+      comment => "Configure a warning banner.",
+      action => STIGS_policy,
+      handle => "maintain_sshd_config_insert_lines_gen005540";
+
+    GEN001120::
+      "PermitRootLogin no      # GEN001120" -> { "GEN001120" } 
+      comment => "Normally, don't allow root to use SSH directly.",
+      action => STIGS_policy,
+      handle => "maintain_sshd_config_insert_lines_gen001120";
+
+    GEN005500::
+      "Protocol 2     # GEN005500" -> { "GEN005500" }
+      comment => "Allow only SSH Protocol version 2",
+      action => STIGS_policy,
+      handle => "maintain_sshd_config_insert_lines_gen005500";
+}
+
+# GEN005500
+bundle edit_line maintain_ssh_config
+{
+
+  delete_lines:
+    GEN005500::
+      "^Ciphers.*" -> { "GEN005500" }
+      comment => "Clear up an existing Ciphers",
+      action => STIGS_policy,
+      handle => "maintain_ssh_config_delete_lines_gen005500";
+
+  insert_lines:
+    GEN005500::
+      "Ciphers aes256-cbc,aes192-cbc,blowfish-cbc,cast128-cbc,aes128-cbc,3des-cbc" -> { "GEN005500" }
+      comment => "Allow only specific ciphers to be used",
+      action => STIGS_policy,
+      handle => "maintain_ssh_config_insert_lines_gen005500";
+}
+
+# LNX00140
+bundle edit_line maintain_grub(default_password)
+{
+  delete_lines:
+    LNX00140::
+      "^password.*" -> { "LNX00140" }
+      comment => "Clear up an existing MD5 encrypted password.",
+      action => STIGS_policy,
+      handle => "maintain_grub_delete_lines_lnx00140";
+
+  insert_lines:
+    LNX00140::
+      "$(default_password)" -> { "LNX00140" }
+      comment => "Use an MD5 encrypted password to GRUB",
+      action => STIGS_policy,
+      handle => "maintain_grub_insert_lines_lnx00140",
+      location => before("^title.*");
+}
+
+# LNX00360
+bundle edit_line maintain_gdm_custom_conf
+{
+  insert_lines:
+    LNX00360::
+      "[server-Standard]
+name=Standard server
+command=/usr/bin/Xorg -br -audit 4 -s 15
+flexible=true" -> { "LNX00360" }
+      comment => "Enable X server audit level 4 and 15 minutes timeout time",
+      action => STIGS_policy,
+      handle => "maintain_gdm_custom_conf_insert_lines_lnx00360",
+      insert_type => "preserve_block";
+}
+
+# GEN004900
+bundle edit_line maintain_ftpusers(name)
+{
+  insert_lines:
+    GEN004900::
+      "root" -> { "GEN004900" }
+      comment => "Add system accounts to /etc/ftpusers",
+      action => STIGS_policy,
+      handle => "maintain_ftpusers_insert_lines_root_gen004900";
+
+      "avahi-autoipd" -> { "GEN004900" }
+      comment => "Add system accounts to /etc/ftpusers",
+      action => STIGS_policy,
+      handle => "maintain_ftpusers_insert_lines_avahi_autoipd_gen004900";
+
+      "$(name)" -> { "GEN004900" }
+      comment => "Add system accounts to /etc/ftpusers",
+      action => STIGS_policy,
+      handle => "maintain_ftpusers_insert_lines_system_accounts_gen004900";
+}
+
+# GEN001960
+bundle edit_line remove_mesg_y
+{
+  delete_lines:
+    GEN001960::
+      ".*mesg\h+\-y.*"
+      comment => "Remove mesg -y",
+      action => STIGS_policy,
+      handle => "remove_mesg_y_delete_lines_gen001960_1";
+
+      ".*mesg\h+y.*"
+      comment => "Remove mesg y",
+      action => STIGS_policy,
+      handle => "remove_mesg_y_delete_lines_gen001960_2";
+}
+
+# GEN001020
+bundle edit_line maintain_security_access_conf
+{
+  insert_lines:
+    GEN001020::
+      "# Only access for root is cron
++ : root : cron crond tty1
+- : ALL EXCEPT users : ALL" -> { "GEN001020" }
+      comment => "Allow only root uses cron",
+      action => STIGS_policy,
+      handle => "maintain_security_access_conf_insert_lines_gen001020",
+      insert_type => "preserve_block";
+}
+
 # GEN002420
 bundle edit_line set_fstab_field(path, field, val)
 {
@@ -1657,10 +1982,24 @@ body perms group(list)
       groups => {"$(list)"};
 }
 
+body file_select cron_dirs
+{
+      leaf_name => { "cron.*" };
+      file_types      => { "dir" };
+      file_result => "leaf_name.file_types";
+}
+
 body location before(str)
 {
       before_after => "before";
       first_last => "first";
+      select_line_matching => "$(str)";
+}
+
+body location after(str)
+{
+      before_after => "after";
+      first_last => "last";
       select_line_matching => "$(str)";
 }
 
