@@ -1,7 +1,15 @@
 {
     "Security::STIGS":
     {
-        "fix": false,
+        "action": { "bycontext": 
+                    {
+                        "somemachines": "fix",
+                        "ignored_machines": "nop",
+                        "!somemachines.!ignored_machines": "warn"
+                    }
+                  },
+
+        "syslog_level": "error",
 
         "definitions":
         {
