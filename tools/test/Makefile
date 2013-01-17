@@ -131,7 +131,7 @@ file_integrity:
 
 STIGS:
 	$(CFSKETCH_DA) --install Security::STIGS --activate Security::STIGS=$(SOURCEDIR)/security/STIGS/params/standard.json
-	$(RUNNER)
+	$(RUNNER) -Dsimulate
 
 wordpress:
 	@echo NOT IMPLEMENTED

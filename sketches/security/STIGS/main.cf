@@ -3,7 +3,7 @@ body file control
   namespace => "cfdc_stigs";
 }
 
-bundle agent entry(prefix, enabled, templates, services, files, audit_rules, edits)
+bundle agent entry(prefix, definitions, templates, services, files, audit_rules, edits)
 {
   meta:
       # __PREFIX__ will be supplied by cf-sketch
@@ -13,7 +13,11 @@ bundle agent entry(prefix, enabled, templates, services, files, audit_rules, edi
       "vars[fix][type]"                  string => "CONTEXT";
       "vars[fix][default]"               string => "!any";
 
-      "vars[enabled][type]"              string => "LIST(NON_EMPTY_STRING)";
+      "vars[definitions][type]"          string => "KVARRAY(
+_key:NON_EMPTY_STRING
+enabled:BOOLEAN
+desc:NON_EMPTY_STRING
+)";
 
       "vars[templates][type]"            string => "KVARRAY(
 _key:PATH
@@ -32,9 +36,16 @@ orphan_filenames_exclude:LIST(PATH)
 _key:NON_EMPTY_STRING
 )";
 
-      "vars[edits][type]"          string => "KVARRAY(
+      "vars[edits][type]"                string => "KVARRAY(
 _key:PATH
 )";
+
+  classes:
+      # For each key of $(definitions) that has an enabled value = 1 (true),
+      # define a class named after that key
+      "$(keys)" expression => strcmp("1","$($(definitions)[$(keys)][enabled])");
+      "not_$(keys)" not => strcmp("1","$($(definitions)[$(keys)][enabled])");
+
   vars:
       # often you need a unique value for the current run through a
       # bundle, especially if you use if_repaired and such.  The
@@ -44,6 +55,334 @@ _key:PATH
       # pretty-print the authors and dependencies
       "dependencies" string => join(", ", "$(prefix)sketch_depends");
       "authors" string => join(", ", "$(prefix)sketch_authors");
+
+      "keys" slist => getindices("$(definitions)");
+
+    default:redhat5||default:simulate::
+      # "default_password"->{"LNX00140"}
+      #         comment => "Variable for grub password='cfengine'",
+      #         handle => "stigs_vars_redhat_5_default_password_grub",
+      #         string => "password --md5 $(const.dollar)1$(const.dollar)8fI020$(const.dollar)YPs7MCo3A1ZkS7xagjYnb0";
+
+      "shadow" -> { "GEN000560" }
+      comment => "Read all contents in /etc/shadow for string manipulation later on",
+      handle => "stigs_vars_redhat_5_strings_from_etc_shadow",
+      string => readfile("/etc/shadow", 99999);
+
+      "shadow_list" -> { "GEN000560" }
+      comment => "Break strings into a list",
+      handle => "stigs_vars_redhat_5_list_from_etc_shadow",
+      slist => splitstring("$(shadow)","[\n]",500);
+
+      "usr_dir" -> { "GEN001080" }
+      comment => "/usr directory",
+      handle => "stigs_vars_redhat_5_usr_directory",
+      string => "/usr/bin";
+
+      "shells" -> { "GEN001080" }
+      comment => "List of Root shells",
+      handle => "stigs_vars_redhat_5_root_shells",
+      slist => { "bash", "sh" };
+
+      "fstab_contents" -> { "GEN001080", "GEN002420" }
+      comment => "All Contents of /etc/fstab",
+      handle => "stigs_vars_redhat_5_fstab_contents",
+      string => readfile("/etc/fstab","4000");
+
+      "network_services_daemon_files" -> { "GEN001180" }
+      comment => "List of Network services daemon files",
+      handle => "stigs_vars_redhat_5_network_services_daemon_files",
+      slist => {
+                 "/var/cfengine/state/cf_incoming.nfsd",
+                 "/var/cfengine/state/cf_outgoing.nfsd",
+                 "/usr/sbin/.*",
+               };
+
+      "system_dirs" -> { "GEN001220", "GEN001240" }
+      comment => "List of important system directories",
+      handle => "stigs_vars_redhat_5_system_dirs",
+      slist =>  {
+                  "/etc",
+                  "/bin",
+                  "/sbin",
+                  "/usr/bin",
+                  "/usr/sbin",
+                };
+
+      "system_log_files" -> { "GEN001260" }
+      comment => "List of system log files",
+      handle => "stigs_vars_redhat_5_system_log_files",
+      slist => {
+                 "/var/log"
+               };
+
+      "manual_page_files" -> { "GEN001280" }
+      comment => "List of manual page files",
+      handle => "stigs_vars_redhat_5_manual_page_files",
+      slist =>  {
+                  "/usr/share/man",
+                  "/usr/share/info",
+                  "/usr/local/man",
+                };
+
+      "library_dirs" -> { "GEN001300" }
+      comment => "List of library files",
+      handle => "stigs_vars_redhat_5_library_dirs",
+      slist =>  {
+                  "/usr/lib",
+                };
+
+      "nis_nisplus_yp_files" -> { "GEN001320", "GEN001340", "GEN001360" }
+      comment => "List of NIS/NIS+/yp files",
+      handle => "stigs_vars_redhat_5_nis_nisplus_yp_files",
+      slist =>  {
+                  "/var/yp",
+                };
+
+      "home_users" -> { "GEN001440", "GEN001460", "GEN001480", "GEN001500", "GEN001520" }
+      comment => "Create a tmp file listing HOME users",
+      handle => "stigs_vars_redhat_5_home_users_tmp",
+      string => execresult("/bin/grep home /etc/passwd | /bin/awk -F':' '{print $1}'","useshell");
+
+      "users_list" -> { "GEN001440", "GEN001460", "GEN001480", "GEN001500", "GEN001520" }
+      comment => "Read the tmp file to create an actual list of HOME users",
+      handle => "stigs_vars_redhat_5_home_users_list",
+      slist => splitstring("$(home_users)", "[\n]", 500);
+
+      "$(users_list)_uid" -> { "GEN001440", "GEN001460", "GEN001480", "GEN001500", "GEN001520" }
+      comment => "List of system UIDs",
+      handle => "stigs_vars_redhat_5_allusers_users_list_uid",
+      int => getuid("@(users_list)");
+
+
+      "rc_files" -> { "GEN001580", "GEN001620", "GEN001660", "GEN001680" }
+      comment => "List of Run Control Scripts",
+      handle => "stigs_vars_redhat_5_rc_files",
+      slist =>  {
+                  "/etc/rc.d/rc",
+                  "/etc/rc.d/rc.local",
+                  "/etc/rc.d/rc.sysinit",
+                };
+
+      "global_init_files" -> { "GEN001720", "GEN001740", "GEN001760", "GEN001780" }
+      comment => "List of Global Initialization files",
+      handle => "stigs_vars_redhat_5_global_init_files",
+      slist =>  {
+                  "/etc/profile",
+                  "/etc/bashrc",
+                  "/etc/environment",
+                };
+
+      "skeleton_dot_files" -> { "GEN001800", "GEN001820" }
+      comment => "List of default/skeleton dot files",
+      handle => "stigs_vars_redhat_5_skeleton_dot_files",
+      slist =>  {
+                  "/etc/skel/.bash_logout",
+                  "/etc/skel/.bash_profile",
+                  "/etc/skel/.emacs",
+                  "/etc/skel/.bashrc",
+                };
+
+      "excluded_local_init_files" -> { "GEN001880" }
+      comment => "List of excluded local initialization files",
+      handle => "stigs_vars_redhat_5_excluded_local_init_files",
+      slist =>  {
+                  ".dt",
+                  ".dtprofile",
+                };
+
+      "hosts_related_files" -> { "GEN002040" }
+      comment => "List of hosts related files",
+      handle => "stigs_vars_redhat_5_hosts_related_files",
+      slist =>  {
+                  "/root/.rhosts",
+                  "/root/.shosts",
+                  "/etc/hosts.equiv",
+                };
+
+      "pam_files" -> { "GEN002100" }
+      comment => "List of PAM files to disable .rhosts",
+      handle => "stigs_vars_redhat_5_pam_files",
+      slist =>  {
+                  "/etc/pam.d/ekshell",
+                  "/etc/pam.d/kshell",
+                };
+
+      "shell_files" -> { "GEN002160", "GEN002180", "GEN002200", "GEN002220" }
+      comment => "List of login shells from /etc/shells",
+      handle => "stigs_vars_redhat_5_shell_files",
+      slist => readstringlist("/etc/shells", "#.*", "[\n]", 10, 1000);
+
+      "fstab_list" -> { "GEN002420" }
+      comment => "Break string into a list",
+      handle => "stigs_vars_redhat_5_list_from_etc_fstab",
+      slist => splitstring("$(fstab_contents)", "[\n]", 100);
+
+      "umask_files" -> { "GEN001560", "GEN002560" }
+      comment => "List of files which contain system and user default umask",
+      handle => "stigs_vars_redhat_5_umask_files",
+      slist =>  {
+                  "/etc/bashrc",
+                  "/etc/csh.cshrc",
+                  "/etc/csh.login",
+                };
+
+      "allusers_not_root" -> { "GEN002640", "GEN003300", "GEN003320" }
+      comment => "List of all system accounts but root and hypen users",
+      handle => "stigs_vars_redhat_5_list_allusers_not_root",
+      slist => getusers("root,avahi-autoipd","0");
+
+      "$(allusers_not_root)_uid" -> { "GEN002640" }
+      comment => "List of system UIDs",
+      handle => "stigs_vars_redhat_5_allusers_not_root_uid",
+      int => getuid("@(allusers_not_root)");
+
+      "preferred_services" -> { "GEN002660" }
+      comment => "List of system services to be turn on",
+      handle => "stigs_vars_redhat_5_preferred_services",
+      slist =>  {
+                  "auditd"
+                };
+
+      "cron_users" -> { "GEN002960" }
+      comment => "List of users who would be able to use cron utility",
+      handle => "stigs_vars_redhat_5_cron_users",
+      slist =>  {
+                  "root",
+                  "user1", # This section needs cron users updated!!
+                  "user2", # This section needs cron users from site.
+                  "user3", # This section needs cron users updated.
+                };
+
+      "cron_dirs" -> { "GEN003040", "GEN003080" }
+      comment => "List of cron directories",
+      handle => "stigs_vars_redhat_5_cron_dirs",
+      slist =>  {
+                  "/etc/cron.hourly",
+                  "/etc/cron.daily",
+                  "/etc/cron.weekly",
+                  "/etc/cron.monthly",
+                  "/etc/cron.d",
+                };
+
+      "other_cron_dirs" -> { "GEN003040", "GEN003080" }
+      comment => "List of other cron directories",
+      handle => "stigs_vars_redhat_5_other_cron_dirs",
+      slist =>  {
+                  "/var/spool/cron",
+                };
+
+      "cron_files" -> { "GEN003040", "GEN003080" }
+      comment => "List of cron files",
+      handle => "stigs_vars_redhat_5_cron_files",
+      slist =>  {
+                  "/etc/crontab",
+                  "/usr/share/logwatch/scripts/logwatch.pl",
+                };
+
+      "at_deny_users" -> { "GEN003300", "GEN003320" }
+      comment => "List of users to add to /etc/at.deny (All users but root)",
+      handle => "stigs_vars_redhat_5_at_deny_users",
+      slist => getusers("root","0");
+
+      "unneeded_services" -> { "GEN003700", "GEN003860" }
+      comment => "List of unneeded inetd/xinetd services to be disabled",
+      handle => "stigs_vars_redhat_5_unneeded_services",
+      slist =>  {
+                  "bluetooth",
+                  "irda",
+                  "im_sensors",
+                  # "portmap",      ##add or remove as necessary per site.
+                  # "rawdevices",
+                  # "rpcgssd",
+                  # "rpcidmapd",
+                  # "rpcsvcgssd",
+                  # "sendmail",
+                  # "xinetd",
+                  "finger"
+                };
+
+      "network_analysis_tools" -> { "GEN003865" }
+      comment => "List of network analysis tools to be disabled",
+      handle => "stigs_vars_redhat_5_network_analysis_tools",
+      slist =>  {
+                  "/usr/sbin/tcpdump",
+                  "/usr/bin/nc",
+                };
+
+      "homes" -> { "GEN004580" }
+      comment => "String source of all home directories on the system",
+      handle => "stigs_vars_redhat_5_homes_source",
+      string => execresult("$(paths.cut) -d: -f6 /etc/passwd","noshell");
+
+      "home_list" -> { "GEN004580" }
+      comment => "List of all home directories on the system (ready to use)",
+      handle => "sting_vars_redhat_5_home_list",
+      slist => splitstring("$(homes)", "[\n]", 100);
+
+      "accounts_to_delete" -> { "GEN004820", "GEN004840", "LNX00320", "LNX00340" }
+      comment => "List of unnecessary accounts",
+      handle => "stigs_vars_redhat_5_accounts_to_delete",
+      slist =>  {
+                  "ftp",
+                  "shutdown",
+                  "halt",
+                  "game",
+                  "news",
+                  "operator",
+                  "gopher",
+                  #"nfsnobody",
+                };
+
+      "ftpusers_files" -> { "GEN004880" }
+      comment => "List of ftpusers files",
+      handle => "stigs_vars_redhat_5_ftpusers_files",
+      slist =>  {
+                  "/etc/ftpusers",
+                  "/etc/vsftpd.ftpusers",
+                };
+
+      "security_tools" -> { "GEN006520" }
+      comment => "List of security tools and databases",
+      handle => "stigs_vars_redhat_5_security_tools",
+      slist =>  {
+                  "/etc/rc.d/init.d/iptables",
+                  "/sbin/iptables",
+                  "/usr/share/logwatch/scripts/services/iptables",
+                };
+
+      "hosts_allow"-> { "GEN006620" }
+      comment => "List of hosts to be assigned to /etc/hosts.allow",
+      handle => "stigs_vars_redhat_5_hosts_allow",
+      slist =>  {
+                  "ALL:10.",
+                  "ALL:172.16.",
+                  "ALL:192.168.",
+                };
+
+    default:redhat5::
+      "$(preferred_services)_status" -> { "GEN002660" }
+      comment => "List of service status of those preferred services",
+      handle => "stigs_vars_redhat_5_preferred_services_status",
+      string => execresult("/sbin/chkconfig --list $(preferred_services)","noshell");
+      "$(unneeded_services)_status" -> { "GEN003700", "GEN003860" }
+      comment => "List of service status of those unneeded services",
+      handle => "stigs_vars_redhat_5_unneeded_services_status",
+      string => execresult("/sbin/chkconfig --list $(unneeded_services)","noshell");
+
+    !default:redhat5::
+      "$(preferred_services)_status" -> { "GEN002660" }
+      comment => "List of service status of those preferred services",
+      handle => "stigs_vars_redhat_5_preferred_services_status",
+      string => "1";
+      "$(unneeded_services)_status" -> { "GEN003700", "GEN003860" }
+      comment => "List of service status of those unneeded services",
+      handle => "stigs_vars_redhat_5_unneeded_services_status",
+      string => "0";
+
+
+  methods:
+      "paths" usebundle => default:paths();
 
   reports:
     default:debug::
@@ -55,5 +394,13 @@ _key:PATH
 
       # use the "verbose" context to display extra information (for the user)
     default:verbose::
-      "Invoking entry_point: prefix $(prefix) enabled $(enabled)";
+      "Invoking $(this.bundle): prefix '$(prefix)'";
+
+      # use the "veryverbose" context to display extra extra information (for the user)
+    default:veryverbose::
+      "Enabled module $(keys): $($(definitions)[$(keys)][desc])"
+      ifvarclass => "$(keys)";
+
+      "Disabled module $(keys): $($(definitions)[$(keys)][desc])"
+      ifvarclass => "not_$(keys)";
 }
