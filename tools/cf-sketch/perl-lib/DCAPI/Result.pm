@@ -134,11 +134,14 @@ sub merge
         push @{$self->$avar()}, @{$other->$avar()};
     }
 
-    foreach my $hvar (qw/error_tags tags data/)
+    foreach my $hvar (qw/error_tags tags/)
     {
         $self->$hvar()->{$_} = $other->$hvar()->{$_}
          foreach keys %{$other->$hvar()};
     }
+
+    my $merged = Util::hashref_merge($self->data(), $other->data());
+    %{$self->data()} = %$merged;
 
     return $self;
 }

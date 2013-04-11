@@ -467,8 +467,8 @@ sub install
             }
             else
             {
-                $result->add_log("already have $d{sketch}",
-                                 "Sketch $d{sketch} is already in target repo; you must uninstall it first");
+                $result->add_warning("already have $d{sketch}",
+                                     "Sketch $d{sketch} is already in target repo; you must uninstall it first");
                 next INSTALLER;
             }
         }
@@ -489,6 +489,7 @@ sub install
 
         return $depcheck unless $depcheck->success();
 
+        $result->merge($depcheck);
         $self->log("Installing sketch $d{sketch} from $d{source} into $d{target}");
 
         my $install_check = $drepo->install($srepo, $sketch);

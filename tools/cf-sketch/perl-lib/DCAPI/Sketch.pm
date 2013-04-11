@@ -361,7 +361,7 @@ sub resolve_dependencies
                             my $install_result = $self->dcapi()->install([\%install_request]);
                             if ($install_result->success())
                             {
-                                $installed = $install_result;
+                                $result->merge($install_result);
                             }
                             else
                             {
